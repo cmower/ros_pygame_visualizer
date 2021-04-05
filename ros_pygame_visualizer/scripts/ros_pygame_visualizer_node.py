@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import re
 import rospy
+# import re
 import rospkg
 import yaml
 from sensor_msgs.msg import Joy
