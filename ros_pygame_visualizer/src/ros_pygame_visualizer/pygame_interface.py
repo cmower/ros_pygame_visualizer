@@ -104,7 +104,7 @@ class BaseObject:
         pygame.draw.rect(surface, pygame.Color(color), rect, width=border_width, border_radius=border_radius)
 
     def drawCircle(self, surface, color, position, radius, border_width=0):
-        pygame.draw.circle(surface, pygame.Color(color), position, radius, width=border_width)
+        pygame.draw.circle(surface, pygame.Color(color), tuple(position), radius, width=border_width)
 
     def drawLine(self, surface, color, start, end, width=1):
         pygame.draw.line(surface, pygame.Color(color), start, end, width=width)
