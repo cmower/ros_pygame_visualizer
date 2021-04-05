@@ -1,0 +1,32 @@
+# Required
+type: planar_workspace
+position: [50, 50]
+width: 400
+real_width: 0.6
+real_height: 0.4
+
+# Optional
+background_color: cyan
+objects:
+
+  - dynamic_point:
+      name: robot
+      topic: robot/position
+      color: black
+      real_radius: 0.02
+      show_trail: False
+      paint: False
+
+  - static_line:
+      real_start: [0.25, 0.25]
+      real_end: [0.4, 0.2]
+      color: red
+      width: 10
+
+  - static_point:
+      real_position: [0.1, 0.2]
+      color: green
+      real_radius: 0.05
+
+
+      
