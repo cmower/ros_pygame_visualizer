@@ -5,6 +5,7 @@ import rospkg
 import yaml
 from sensor_msgs.msg import Joy
 from std_msgs.msg import Int64
+from geometry_msgs.msg import Point
 import ros_pygame_visualizer.pygame_interface as interface
 
 RP = rospkg.RosPack()
@@ -32,22 +33,43 @@ class Node:
 
             # Window setup
             config = self.loadConfig(filename)
+            name = f'window_{idx}'
             window = {
                 'index': idx,
                 'type': config['type'],
-                'position': config['position']
+                'position': config['position'],
+                'name': name,
             }
 
             # Joystick
             if config['type'] == 'joystick':
-                name = f'window_{idx}'
-                window['name'] = name
                 window['topic'] = config['topic']
                 window['object'] = interface.JoystickWindow(config)
                 window['update_handle'] = self.handleJoystick
                 window['horizontal_index'] = config['horizontal_index']
                 window['vertical_index'] = config['vertical_index']
                 rospy.Subscriber(config['topic'], Joy, self.callback, callback_args=name)
+
+            # Planar workspace
+            if config['type'] == 'planar_workspace':
+                window['object'] = interface.PlanarWorkspaceWindow(config)
+                window['update_handle'] = self.handlePlannarWorkspaceWindow
+                window['dynamic_objects'] = []
+
+                for object_index, full_object_config in enumerate(config['objects']):
+                    object_type = list(full_object_config.keys())[0]
+                    object_config = list(full_object_config.values())[0]
+                    if 'dynamic' not in object_type: continue  # static objects are handled when window['object'] is created
+
+                    if object_type == 'dynamic_point':
+                        object_name = object_config['name']
+                        window['dynamic_objects'].append({
+                            'name': object_name,
+                            'handle': self.handleDynamicPoint,
+                            'topic': object_config['topic'],
+                        })
+                        rospy.Subscriber(object_config['topic'], Point, self.callback, callback_args=object_name)
+
 
             # Append window
             self.windows.append(window)
@@ -91,6 +113,25 @@ class Node:
         # Update window
         window['object'].setJoy(horizontal, vertical)
         window['object'].reset()
+
+    def handlePlannarWorkspaceWindow(self, window):
+        for dynamic_object in window['dynamic_objects']:
+            handle = dynamic_object['handle']
+            handle(window, dynamic_object)
+        window['object'].reset()
+
+    def handleDynamicPoint(self, window, dynamic_object):
+        name = dynamic_object['name']
+        try:
+            msg = self.msgs[name]
+        except KeyError:
+            topic = dynamic_object['topic']
+            rospy.logwarn(f'Did not receive messages on the topic {topic} yet!')
+            return
+        update = {
+            'position': [msg.x, msg.y],
+        }
+        window['object'].updateDynamicObject(name, update)
 
     def mainLoop(self):
 

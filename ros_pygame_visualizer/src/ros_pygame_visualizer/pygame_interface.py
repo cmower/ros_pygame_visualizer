@@ -112,6 +112,101 @@ class BaseObject:
     def drawTrajectory(self, surface, color, positions, width=1):
         pygame.draw.lines(surface, pygame.Color(color), False, positions, width)
 
+class PlanarWorkspaceWindow(BaseObject):
+
+    def __init__(self, config):
+
+        # Define height (note, user only must define real width/height and the
+        # width in pixels)
+        self.real_width = float(config['real_width'])
+        self.real_height = float(config['real_height'])
+        self.px_per_m = float(config['width']) / self.real_width
+        self.m_per_px = 1.0/self.px_per_m
+        config['height'] = scaleInt(self.real_height, self.px_per_m)
+
+        # Main setup
+        super().__init__(config)
+
+        # Init objects
+        self.dynamic_objects = {}
+        for full_object_config in config['objects']:
+
+            object_type = list(full_object_config.keys())[0]
+            object_config = list(full_object_config.values())[0]
+
+            if object_type == 'dynamic_point':
+
+                # Create object specification from config
+                spec = {
+                    'type': object_type,
+                    # 'position': [0, 0],
+                    'trail': [],
+                    'color': object_config['color'],
+                    'radius': scaleInt(self.px_per_m, object_config['real_radius']),
+                    'reset_handle': self.resetDynamicPoint,
+                    'update_handle': self.updateDynamicPoint,
+                }
+                if 'show_trail' in object_config.keys():
+                    spec['show_trail'] = object_config['show_trail']
+                    spec['width'] = scaleInt(0.02, self.width)
+                else:
+                    spec['show_trail'] = False
+                if 'paint' in object_config.keys():
+                    spec['paint'] = object_config['paint']
+                else:
+                    spec['paint'] = False
+
+                # Save object
+                name = object_config['name']
+                self.dynamic_objects[name] = spec
+
+            elif object_type == 'static_line':
+                real_start = object_config['real_start']
+                real_end = object_config['real_end']
+                color = object_config['color']
+                width = object_config['width']
+                start = self.toPygameCoordinates(real_start)
+                end = self.toPygameCoordinates(real_end)
+                self.drawLine(self.static_surface, color, start, end, width=width)
+
+            elif object_type == 'static_point':
+                real_position = object_config['real_position']
+                color = object_config['color']
+                real_radius = object_config['real_radius']
+                position = self.toPygameCoordinates(real_position)
+                radius = scaleInt(self.px_per_m, real_radius)
+                self.drawCircle(self.static_surface, color, position, radius)
+
+    def toPygameCoordinates(self, position):
+        return [scaleInt(self.px_per_m, position[0]), scaleInt(self.px_per_m, position[1])]
+
+    def resetDynamicPoint(self, spec):
+        if spec['show_trail'] and len(spec['trail']) > 2:
+            self.drawTrajectory(self.surface, spec['color'], spec['trail'], width=spec['width'])
+        if spec['paint'] and 'position' in spec:
+            # Note, this won't be seen till next iteration so the current
+            # position will always have to be drawn to self.surface too
+            self.drawCircle(self.static_surface, spec['color'], spec['position'], spec['radius'])
+        if 'position' in spec:
+            self.drawCircle(self.surface, spec['color'], spec['position'], spec['radius'])
+
+    def updateDynamicPoint(self, name, update):
+        position = self.toPygameCoordinates(update['position'])
+        self.dynamic_objects[name]['position'] = position
+        if self.dynamic_objects[name]['show_trail']:
+            self.dynamic_objects[name]['trail'].append(position)
+
+    def updateDynamicObject(self, name, update):
+        handle = self.dynamic_objects[name]['update_handle']
+        handle(name, update)
+
+    def reset(self):
+        self.resetBaseObject()
+        for spec in self.dynamic_objects.values():
+            handle = spec['reset_handle']
+            handle(spec)
+
+
 class JoystickWindow(BaseObject):
 
     base_color = 'grey'
