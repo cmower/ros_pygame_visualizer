@@ -1,0 +1,12 @@
+# Required
+type: 'joystick'
+position: [500, 50]
+topic: 'joy'
+horizontal_index: 0
+vertical_index: 1
+width: 400
+
+# Optional
+vertical_direction: -1
+horizontal_direction: -1
+background_color: 'red'

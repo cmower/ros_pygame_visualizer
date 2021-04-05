@@ -1,0 +1,8 @@
+# Required
+width: 950
+height: 500
+
+# Optional
+background_color: 'blue'
+caption: 'Example: two joysticks'
+

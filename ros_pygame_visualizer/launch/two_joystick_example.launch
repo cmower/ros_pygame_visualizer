@@ -1,0 +1,31 @@
+<launch>
+
+  <!-- <!-\- Use map keyboard direction keys to joy -\-> -->
+  <!-- <node pkg="keyboard" name="keyboard" type="keyboard"/> -->
+
+  <!-- <node pkg="operator_node" name="keyboard_to_joy_mapper_node" type="keyboard_to_joy_mapper_node.py" output="screen"> -->
+  <!--   <rosparam param="positive_axes">[KEY_UP, KEY_RIGHT]</rosparam> -->
+  <!--   <rosparam param="negative_axes">[KEY_DOWN, KEY_LEFT]</rosparam> -->
+  <!--   <param name="frequency" type="int" value="100"/> -->
+  <!-- </node> -->
+
+  <!-- Use joystick -->
+  <node pkg="joy" name="joy_node" type="joy_node">
+    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="autorepeat_rate" type="double" value="120"/>
+    <param name="deadzone" type="double" value="0"/>
+  </node>
+
+  <!-- Start visualizer -->
+  <node pkg="ros_pygame_visualizer" name="visualizer" type="ros_pygame_visualizer_node.py" output="screen">
+    <param name="main" type="str"
+        value="$(find ros_pygame_visualizer)/example_resources/two_joystick_example_main.yaml"/>
+    <rosparam param="windows">[
+    $(find ros_pygame_visualizer)/example_resources/two_joystick_example_left.yaml,
+    $(find ros_pygame_visualizer)/example_resources/two_joystick_example_right.yaml
+    ]</rosparam>
+  </node>
+
+
+
+</launch>
