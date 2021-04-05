@@ -7,15 +7,9 @@ def scaleInt(a, x):
 class BaseObject:
 
     def __init__(self, config):
+
+        # Save config
         self.config = config
-
-    def inConfig(self, key):
-        if key in self.config.keys():
-            return self.config[key]
-        else:
-            return None
-
-    def setupSurface(self):
 
         # Setup surface
         width = self.config['width']
@@ -40,6 +34,12 @@ class BaseObject:
         else:
             background_color = pygame.Color('white')
         self.static_surface.fill(background_color)
+
+    def inConfig(self, key):
+        if key in self.config.keys():
+            return self.config[key]
+        else:
+            return None
 
     def saveScreen(self, filename):
         pygame.image.save(self.surface, filename)
@@ -121,7 +121,6 @@ class JoystickWindow(BaseObject):
 
         # Main setup
         super().__init__(config)
-        self.setupSurface()
 
         # Draw static features
         middle = scaleInt(0.5, self.width)
@@ -162,9 +161,6 @@ class MainScreen(BaseObject):
 
     def __init__(self, config, frequency):
         super().__init__(config)
-
-        # Setup surface
-        self.setupSurface()
 
         # Setup main screen
         self.screen = pygame.display.set_mode(self.surface.get_size())
