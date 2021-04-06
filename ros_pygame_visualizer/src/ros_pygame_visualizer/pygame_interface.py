@@ -35,6 +35,9 @@ class BaseObject:
             background_color = pygame.Color('white')
         self.static_surface.fill(background_color)
 
+        # Setup fonts
+        self.fonts = {}
+
     def inConfig(self, key):
         if key in self.config.keys():
             return self.config[key]
@@ -111,6 +114,27 @@ class BaseObject:
 
     def drawTrajectory(self, surface, color, positions, width=1):
         pygame.draw.lines(surface, pygame.Color(color), False, positions, width)
+
+    def makeFontKey(self, name, size, bold, italic):
+        return f'{name}_|_{size}_|_{bold}_|_{italic}'
+
+    def unmakeFontKey(self, key):
+        parts = key.split('_|_')
+        name = parts[0]
+        size = int(parts[1])
+        bold = eval(parts[2]) # bool(parts[2]) -> True (always)
+        italic = eval(parts[3]) # bool(parts[3]) -> True (always)
+        return name, size, bold, italic
+
+    def setupFont(self, name, size, bold=False, italic=False):
+        key = self.makeFontKey(name, size, bold, italic)
+        if key not in self.fonts.keys():
+            self.fonts[key] = pygame.font.SysFont(name, size, bold=bold, italic=italic)
+        return key
+
+    def drawText(self, surface, key, text, antialias, color, background=None):
+        text_surface = self.fonts[key].render(text, antialias, pygame.Color(color), background=background)
+        surface.blit(text_surface, (0, 0))
 
 class PlanarWorkspaceWindow(BaseObject):
 
