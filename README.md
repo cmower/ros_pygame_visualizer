@@ -9,7 +9,7 @@ package is powered by [pygame](https://www.pygame.org/news).
 A main config file provides parameters that adjust the overall layout. A number
 of configs can be specified that each create a "*window*". Every window can be
 setup to visualize some streaming data from ROS. See the *Windows* section below
-for details.
+for details. Examples are provided, see files in `launch/`.
 
 ## Windows
 
