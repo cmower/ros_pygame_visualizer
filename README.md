@@ -28,6 +28,8 @@ be easily specified. The following objects can be visualized:
   coordinate axes.
 - *Dynamic line*: tracks `std_msgs/Float64MultiArray` messages that define a
   continuous line.
+- *Dynamic point array*: tracks `std_msgs/Float64MultiArray` that define points
+  on the surface to visualize. 
 
 **Note**, currently coordinates must be specified in the local image frame
 (scaling between meters and pixels is handled in the config file). At present,
