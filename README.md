@@ -21,4 +21,14 @@ A joystick window can be setup to visualize `sensor_msgs/Joy` messages.
 
 A 2D workspace can be setup to visualize simple representations, e.g. a robot
 position in a 2D space. The path taken by a robot, additional lines/points can
-be easily specified.
+be easily specified. The following objects can be visualized:
+- *Static point*: creates a single unchanging point in the window.
+- *Static line*: creates a single unchanging line in the window.
+- *Dynamic point*: tracks `geometry_msgs/Point` messages defined in the local
+  coordinate axes.
+- *Dynamic line*: tracks `std_msgs/Float64MultiArray` messages that define a
+  continuous line.
+
+**Note**, currently coordinates must be specified in the local image frame
+(scaling between meters and pixels is handled in the config file). At present,
+you can not specify additional coordinate frames - future work.
