@@ -201,6 +201,20 @@ class PlanarWorkspaceWindow(BaseObject):
                 name = object_config['name']
                 self.dynamic_objects[name] = spec
 
+            elif object_type == 'dynamic_point_array':
+
+                spec = {
+                    'type': object_type,
+                    'color': object_config['color'],
+                    'positions': [],
+                    'radius': scaleInt(self.px_per_m, object_config['real_radius']),
+                    'reset_handle': self.resetDynamicPointArray,
+                    'update_handle': self.updateDynamicPointArray,
+                }
+
+                name = object_config['name']
+                self.dynamic_objects[name] = spec
+
             elif object_type == 'static_line':
                 real_start = object_config['real_start']
                 real_end = object_config['real_end']
@@ -228,6 +242,15 @@ class PlanarWorkspaceWindow(BaseObject):
     def updateDynamicLine(self, name, update):
         positions = [self.toPygameCoordinates(p) for p in update['positions']]
         self.dynamic_objects[name]['positions'] = positions
+
+    def resetDynamicPointArray(self, spec):
+        for p in spec['positions']:
+            self.drawCircle(self.surface, spec['color'], p, spec['radius'])
+
+    def updateDynamicPointArray(self, name, update):
+        # Note, the functionality of updateDynamicLine is precicsely what is
+        # needed here - best to avoid copy/paste!
+        self.updateDynamicLine(name, update)
 
     def resetDynamicPoint(self, spec):
         if spec['show_trail'] and len(spec['trail']) > 2:

@@ -76,6 +76,10 @@ class Node:
                         dynamic_object['handle'] = self.handleDynamicLine
                         self.startSubscriber(object_name, object_topic, Float64MultiArray)
 
+                    elif object_type == 'dynamic_point_array':
+                        dynamic_object['handle'] = self.handleDynamicPointArray
+                        self.startSubscriber(object_name, object_topic, Float64MultiArray)
+
                     window['dynamic_objects'].append(dynamic_object)
 
             # Append window
@@ -149,16 +153,28 @@ class Node:
         }
         window['object'].updateDynamicObject(name, update)
 
-    def handleDynamicLine(self, window, dynamic_object):
-        name = dynamic_object['name']
-        msg = self.getMsg(name)
-        if msg is None: return
+    def extractPositionsFromFloat64MultiArrayMsg(self, msg):
         # Positions are contained in msg.data. Assume, len(msg.data) = 2*N,
         # where msg.data[:N] are x-axis coordinates and msg.data[N:] are y-axis
         # coordinates.
         N = int(len(msg.data)/2)
+        return [[px, py] for px, py in zip(msg.data[:N], msg.data[N:])]
+
+    def handleDynamicLine(self, window, dynamic_object):
+        name = dynamic_object['name']
+        msg = self.getMsg(name)
+        if msg is None: return
         update = {
-            'positions': [[px, py] for px, py in zip(msg.data[:N], msg.data[N:])]
+            'positions': self.extractPositionsFromFloat64MultiArrayMsg(msg)
+        }
+        window['object'].updateDynamicObject(name, update)
+
+    def handleDynamicPointArray(self, window, dynamic_object):
+        name = dynamic_object['name']
+        msg = self.getMsg(name)
+        if msg is None: return
+        update = {
+            'positions': self.extractPositionsFromFloat64MultiArrayMsg(msg)
         }
         window['object'].updateDynamicObject(name, update)
 

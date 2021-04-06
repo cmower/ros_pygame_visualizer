@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import rospy
+import random
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Point
 from std_msgs.msg import Float64MultiArray
@@ -16,8 +17,15 @@ class Node:
         self.u = [0, 0]
         self.pub_robot = rospy.Publisher('robot/position', Point, queue_size=10)
         self.pub_pred = rospy.Publisher('prediction/position', Float64MultiArray, queue_size=10)
+        self.pub_point_array = rospy.Publisher('point_array/position', Float64MultiArray, queue_size=10)
+        self.points = []
         rospy.Subscriber('joy', Joy, self.callback)
         rospy.Timer(rospy.Duration(self.dt), self.mainLoop)
+        rospy.Timer(rospy.Duration(1.0), self.publishPointArray)
+
+    def publishPointArray(self, event):
+        self.points.append([0.6*random.random(), 0.45*random.random()])
+        self.pub_point_array.publish(Float64MultiArray(data=[p[0] for p in self.points] + [p[1] for p in self.points]))
 
     def callback(self, msg):
         self.u = [-self.maxu * msg.axes[0], -self.maxu * msg.axes[1]]
