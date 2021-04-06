@@ -62,7 +62,7 @@ class Node:
                     if 'dynamic' not in object_type: continue  # static objects are handled when window['object'] is created
 
                     if object_type == 'dynamic_point':
-                        object_name = object_config['name']
+                        object_name = name + '_' + object_config['name']
                         window['dynamic_objects'].append({
                             'name': object_name,
                             'handle': self.handleDynamicPoint,
