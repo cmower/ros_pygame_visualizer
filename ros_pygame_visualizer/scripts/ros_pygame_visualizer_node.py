@@ -54,7 +54,7 @@ class Node:
             # Planar workspace
             if config['type'] == 'planar_workspace':
                 window['object'] = interface.PlanarWorkspaceWindow(config)
-                window['update_handle'] = self.handlePlannarWorkspaceWindow
+                window['update_handle'] = self.handlePlanarWorkspaceWindow
                 window['dynamic_objects'] = []
 
                 for object_index, full_object_config in enumerate(config['objects']):
@@ -126,7 +126,7 @@ class Node:
         window['object'].setJoy(horizontal, vertical)
         window['object'].reset()
 
-    def handlePlannarWorkspaceWindow(self, window):
+    def handlePlanarWorkspaceWindow(self, window):
         for dynamic_object in window['dynamic_objects']:
             handle = dynamic_object['handle']
             handle(window, dynamic_object)

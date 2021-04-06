@@ -21,7 +21,7 @@
     <param name="main" type="str"
         value="$(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_main.yaml"/>
     <rosparam param="windows">[
-    $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_plannar_workspace.yaml,
+    $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_planar_workspace.yaml,
     $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_joy.yaml,
     ]</rosparam>
   </node>
