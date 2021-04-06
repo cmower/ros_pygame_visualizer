@@ -2,7 +2,7 @@
 
 This package allows you to quickly setup various visualizations. When the main
 `ros_pygame_visualizer` node is launched a *screen* appears that can be
-configured to track ROS data and visualize it, any number of config files can be
+configured to track ROS data and visualize it. Any number of config files can be
 specified that give the layout and properties of the screen. The package is
 powered by [pygame](https://www.pygame.org/news).
 
