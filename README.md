@@ -1,15 +1,15 @@
 # ros_pygame_visualizer
 
 This package allows you to quickly setup various visualizations. When the main
-`ros_pygame_visualizer` node is launched a *screen*, a number of config files
-can be specified that specify the layout and properties of the screen. The
-package is powered by [pygame](https://www.pygame.org/news).
-
+`ros_pygame_visualizer` node is launched a *screen* appears that can be
+configured to track ROS data and visualize it, any number of config files can be
+specified that give the layout and properties of the screen. The package is
+powered by [pygame](https://www.pygame.org/news).
 
 A main config file provides parameters that adjust the overall layout. A number
-of configs can be specified that each create a "*window*". Every window can be
-setup to visualize some streaming data from ROS. See the *Windows* section below
-for details. Examples are provided, see files in `launch/`.
+of other configs can be specified that each create a "*window*". Every window
+can be setup to visualize certain ROS data in a helpful way. See the *Windows*
+section below for details. Examples are provided, see `launch/`.
 
 ## Windows
 
