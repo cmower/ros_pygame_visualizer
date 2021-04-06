@@ -12,7 +12,7 @@ objects:
   - dynamic_point:
       name: robot
       topic: robot/position
-      color: black
+      color: blue
       real_radius: 0.02
       show_trail: False
       paint: False
