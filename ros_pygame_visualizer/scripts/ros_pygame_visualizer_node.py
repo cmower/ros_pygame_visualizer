@@ -118,7 +118,7 @@ class Node:
             vertical = msg.axes[window['vertical_index']]
         except KeyError:
             topic = window['topic']
-            rospy.logwarn(f'Did not receive messages on the topic {topic} yet')
+            rospy.logdebug(f'Did not receive messages on the topic {topic} yet')
             horizontal = 0.0
             vertical = 0.0
 
@@ -136,7 +136,7 @@ class Node:
         try:
             msg = self.msgs[name]
         except KeyError:
-            rospy.logwarn(f'Did not receive messages for the object called {name} yet!')
+            rospy.logdebug(f'Did not receive messages for the object called {name} yet!')
             msg = None
         return msg
 
