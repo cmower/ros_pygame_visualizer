@@ -123,6 +123,7 @@ class PlanarWorkspaceWindow(BaseObject):
         self.px_per_m = float(config['width']) / self.real_width
         self.m_per_px = 1.0/self.px_per_m
         config['height'] = scaleInt(self.real_height, self.px_per_m)
+        print("Creating planar workspace object with dimensions (%d, %d)" % (config['width'], config['height']))
 
         # Main setup
         super().__init__(config)
