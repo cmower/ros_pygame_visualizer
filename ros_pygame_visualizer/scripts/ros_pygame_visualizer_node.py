@@ -26,6 +26,7 @@ class Node:
         main_config_filename = rospy.get_param('~main')
         main_config = self.loadConfig(main_config_filename)
         self.main_screen = interface.MainScreen(main_config, hz)
+        self.msg_keys = set()
 
         # Init window
         self.windows = []
