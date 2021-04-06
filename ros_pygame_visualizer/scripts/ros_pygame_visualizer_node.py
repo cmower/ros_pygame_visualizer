@@ -4,7 +4,7 @@ import rospy
 import rospkg
 import yaml
 from sensor_msgs.msg import Joy
-from std_msgs.msg import Int64
+from std_msgs.msg import Int64, Float64MultiArray
 from geometry_msgs.msg import Point
 import ros_pygame_visualizer.pygame_interface as interface
 
@@ -61,16 +61,22 @@ class Node:
                     object_type = list(full_object_config.keys())[0]
                     object_config = list(full_object_config.values())[0]
                     if 'dynamic' not in object_type: continue  # static objects are handled when window['object'] is created
+                    object_name = object_config['name']
+                    object_topic = object_config['topic']
+                    dynamic_object = {
+                        'name': object_name,
+                        'topic': object_topic,
+                    }
 
                     if object_type == 'dynamic_point':
-                        object_name = name + '_' + object_config['name']
-                        window['dynamic_objects'].append({
-                            'name': object_name,
-                            'handle': self.handleDynamicPoint,
-                            'topic': object_config['topic'],
-                        })
-                        self.startSubscriber(object_name, object_config['topic'], Point)
+                        dynamic_object['handle'] = self.handleDynamicPoint
+                        self.startSubscriber(object_name, object_topic, Point)
 
+                    elif object_type == 'dynamic_line':
+                        dynamic_object['handle'] = self.handleDynamicLine
+                        self.startSubscriber(object_name, object_topic, Float64MultiArray)
+
+                    window['dynamic_objects'].append(dynamic_object)
 
             # Append window
             self.windows.append(window)
@@ -126,16 +132,33 @@ class Node:
             handle(window, dynamic_object)
         window['object'].reset()
 
-    def handleDynamicPoint(self, window, dynamic_object):
-        name = dynamic_object['name']
+    def getMsg(self, name):
         try:
             msg = self.msgs[name]
         except KeyError:
-            topic = dynamic_object['topic']
-            rospy.logwarn(f'Did not receive messages on the topic {topic} yet!')
-            return
+            rospy.logwarn(f'Did not receive messages for the object called {name} yet!')
+            msg = None
+        return msg
+
+    def handleDynamicPoint(self, window, dynamic_object):
+        name = dynamic_object['name']
+        msg = self.getMsg(name)
+        if msg is None: return
         update = {
             'position': [msg.x, msg.y],
+        }
+        window['object'].updateDynamicObject(name, update)
+
+    def handleDynamicLine(self, window, dynamic_object):
+        name = dynamic_object['name']
+        msg = self.getMsg(name)
+        if msg is None: return
+        # Positions are contained in msg.data. Assume, len(msg.data) = 2*N,
+        # where msg.data[:N] are x-axis coordinates and msg.data[N:] are y-axis
+        # coordinates.
+        N = int(len(msg.data)/2)
+        update = {
+            'positions': [[px, py] for px, py in zip(msg.data[:N], msg.data[N:])]
         }
         window['object'].updateDynamicObject(name, update)
 

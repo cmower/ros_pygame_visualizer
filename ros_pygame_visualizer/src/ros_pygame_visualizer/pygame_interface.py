@@ -161,6 +161,22 @@ class PlanarWorkspaceWindow(BaseObject):
                 name = object_config['name']
                 self.dynamic_objects[name] = spec
 
+            elif object_type == 'dynamic_line':
+
+                # Create spec
+                spec = {
+                    'type': object_type,
+                    'color': object_config['color'],
+                    'positions': [],
+                    'reset_handle': self.resetDynamicLine,
+                    'update_handle': self.updateDynamicLine,
+                    'width': scaleInt(0.02, self.width),
+                }
+
+                # Save object
+                name = object_config['name']
+                self.dynamic_objects[name] = spec
+
             elif object_type == 'static_line':
                 real_start = object_config['real_start']
                 real_end = object_config['real_end']
@@ -180,6 +196,14 @@ class PlanarWorkspaceWindow(BaseObject):
 
     def toPygameCoordinates(self, position):
         return [scaleInt(self.px_per_m, position[0]), scaleInt(self.px_per_m, position[1])]
+
+    def resetDynamicLine(self, spec):
+        if len(spec['positions']) > 2:
+            self.drawTrajectory(self.surface, spec['color'], spec['positions'], width=spec['width'])
+
+    def updateDynamicLine(self, name, update):
+        positions = [self.toPygameCoordinates(p) for p in update['positions']]
+        self.dynamic_objects[name]['positions'] = positions
 
     def resetDynamicPoint(self, spec):
         if spec['show_trail'] and len(spec['trail']) > 2:

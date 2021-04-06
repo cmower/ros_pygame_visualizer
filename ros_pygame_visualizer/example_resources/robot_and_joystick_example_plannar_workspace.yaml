@@ -28,5 +28,8 @@ objects:
       color: green
       real_radius: 0.05
 
-
-      
+  - dynamic_line:
+      name: prediction
+      topic: prediction/position
+      color: gold
+      width: 10
