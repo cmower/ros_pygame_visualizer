@@ -48,7 +48,7 @@ class Node:
                 window['update_handle'] = self.handleJoystick
                 window['horizontal_index'] = config['horizontal_index']
                 window['vertical_index'] = config['vertical_index']
-                rospy.Subscriber(config['topic'], Joy, self.callback, callback_args=name)
+                self.startSubscriber(name, config['topic'], Joy)
 
             # Planar workspace
             if config['type'] == 'planar_workspace':
@@ -68,7 +68,7 @@ class Node:
                             'handle': self.handleDynamicPoint,
                             'topic': object_config['topic'],
                         })
-                        rospy.Subscriber(object_config['topic'], Point, self.callback, callback_args=object_name)
+                        self.startSubscriber(object_name, object_config['topic'], Point)
 
 
             # Append window
@@ -76,6 +76,11 @@ class Node:
 
         # Init status publisher
         self.status_pub = rospy.Publisher('ros_pygame_visualizer/status', Int64, queue_size=10)
+
+    def startSubscriber(self, name, topic, msg_type):
+        assert name not in self.msg_keys, "name ({name}) must be unique."
+        rospy.Subscriber(topic, msg_type, self.callback, callback_args=name)
+        self.msg_keys.add(name)
 
     def loadConfig(self, filename):
 
