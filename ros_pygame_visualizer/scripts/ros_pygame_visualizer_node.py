@@ -181,8 +181,8 @@ class Node:
 
         # Report main loop completion
         self.main_loop_iter += 1
-        s = 's' if self.main_loop_iter > 1 else ''
-        rospy.loginfo(f'Completed {self.main_loop_iter} iteration{s} of main loop.')
+        # s = 's' if self.main_loop_iter > 1 else ''
+        # rospy.loginfo(f'Completed {self.main_loop_iter} iteration{s} of main loop.')
 
         return not did_user_quit
 
