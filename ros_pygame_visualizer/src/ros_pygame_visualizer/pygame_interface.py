@@ -1,6 +1,21 @@
 import pygame
 pygame.init()
 
+"""
+Notes
+-----
+
+The idea of the static_surface is that it can be initialized with a appearance
+that doesn't change from frame-to-frame. This reduces overhead if there are a
+lot of features in the window that need to be drawn.
+
+In some cases (e.g. PlanarWorkspaceWindow), the static_surface attribute is not
+necessarily static. In these cases, the static_surface is updated during the
+reset phase. This allows "paint" features without increasing overhead by a
+significant amount.
+
+"""
+
 def scaleInt(a, x):
     return int(round(a * float(x)))
 
