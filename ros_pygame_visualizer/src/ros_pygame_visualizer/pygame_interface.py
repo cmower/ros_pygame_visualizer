@@ -60,7 +60,7 @@ class BaseObject:
         else:
             return None
 
-    def saveScreen(self, filename):
+    def save(self, filename):
         pygame.image.save(self.surface, filename)
 
     def blit(self, surface, position):
