@@ -187,13 +187,17 @@ class PlanarWorkspaceWindow(BaseObject):
                     'reset_handle': self.resetDynamicPoint,
                     'update_handle': self.updateDynamicPoint,
                 }
-                if 'show_trail' in object_config.keys():
-                    spec['show_trail'] = object_config['show_trail']
+
+                show_trail = self.inConfig('show_trail', config=object_config)
+                if show_trail is not None:
+                    spec['show_trail'] = show_trail
                     spec['width'] = scaleInt(0.02, self.width)
                 else:
                     spec['show_trail'] = False
-                if 'paint' in object_config.keys():
-                    spec['paint'] = object_config['paint']
+
+                paint = self.inConfig('paint', config=object_config)
+                if paint is not None:
+                    spec['paint'] = paint
                 else:
                     spec['paint'] = False
 
