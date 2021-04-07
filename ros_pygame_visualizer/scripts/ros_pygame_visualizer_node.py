@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import rospy
 # import re
 import rospkg
@@ -7,11 +8,15 @@ from sensor_msgs.msg import Joy, Image
 from std_msgs.msg import Int64, Float64MultiArray
 from geometry_msgs.msg import Point
 import ros_pygame_visualizer.pygame_interface as interface
+from ros_pygame_visualizer.srv import SaveImage, SaveImageResponse
 from cv_bridge import CvBridge
 
 RP = rospkg.RosPack()
 
 class Node:
+
+    path_to_pictures = os.path.join(os.environ['HOME'], 'Data', 'ros_pygame_visualizer')
+    assert os.path.exists(path_to_pictures), f"The directory {path_to_pictures} must exist!"
 
     def __init__(self):
 
@@ -28,6 +33,7 @@ class Node:
         main_config = self.loadConfig(main_config_filename)
         self.main_screen = interface.MainScreen(main_config, hz)
         self.msg_keys = set()
+        rospy.loginfo(f'Setup main screen window at index 0.')
 
         # Setup cv bridge
         self.cv_bridge = CvBridge()
@@ -38,16 +44,18 @@ class Node:
 
             # Window setup
             config = self.loadConfig(filename)
+            window_index = idx+1
+            window_type = config['type']
             name = f'window_{idx}'
             window = {
-                'index': idx,
-                'type': config['type'],
+                'index': window_index,
+                'type': window_type,
                 'position': config['position'],
                 'name': name,
             }
 
             # Joystick
-            if config['type'] == 'joystick':
+            if window_type == 'joystick':
                 window['topic'] = config['topic']
                 window['object'] = interface.JoystickWindow(config)
                 window['update_handle'] = self.handleJoystick
@@ -56,7 +64,7 @@ class Node:
                 self.startSubscriber(name, config['topic'], Joy)
 
             # Image
-            if config['type'] == 'image':
+            if window_type == 'image':
                 window['topic'] = config['topic']
                 window['object'] = interface.ImageWindow(config)
                 window['update_handle'] = self.handleImage
@@ -65,7 +73,7 @@ class Node:
                 self.startSubscriber(name, config['topic'], Image)
 
             # Planar workspace
-            if config['type'] == 'planar_workspace':
+            if window_type == 'planar_workspace':
                 window['object'] = interface.PlanarWorkspaceWindow(config)
                 window['update_handle'] = self.handlePlanarWorkspaceWindow
                 window['dynamic_objects'] = []
@@ -97,9 +105,33 @@ class Node:
 
             # Append window
             self.windows.append(window)
+            rospy.loginfo(f'Setup {window_type} window at index {window_index}.')
 
         # Init status publisher
         self.status_pub = rospy.Publisher('ros_pygame_visualizer/status', Int64, queue_size=10)
+
+        # Init services
+        rospy.Service('save_image', SaveImage, self.saveImageService)
+
+    def saveImageService(self, req):
+        window = req.window
+        success = 0
+        if window == 0:
+            stamp = rospy.Time.now().to_sec()
+            filename = os.path.join(self.path_to_pictures, f'main_screen_{stamp}.png')
+            self.main_screen.save(filename)
+        elif window > 0:
+            idx = window - 1
+            name = self.windows[idx]['name']
+            stamp = rospy.Time.now().to_sec()
+            filename = os.path.join(self.path_to_pictures, f'{name}_{stamp}.png')
+            self.windows[idx]['object'].save(filename)
+        else:
+            rospy.logerr('Window request for service save_image needs to be >=0.')
+            success = 1
+        if success == 0:
+            rospy.loginfo(f'Saved {filename}')
+        return SaveImageResponse(success)
 
     def startSubscriber(self, name, topic, msg_type):
         assert name not in self.msg_keys, "name ({name}) must be unique."
