@@ -228,6 +228,12 @@ class PlanarWorkspaceWindow(BaseObject):
                     'update_handle': self.updateDynamicPointArray,
                 }
 
+                paint = self.inConfig('paint', config=object_config)
+                if paint is not None:
+                    spec['paint'] = paint
+                else:
+                    spec['paint'] = False
+
                 name = object_config['name']
                 self.dynamic_objects[name] = spec
 
@@ -262,6 +268,8 @@ class PlanarWorkspaceWindow(BaseObject):
     def resetDynamicPointArray(self, spec):
         for p in spec['positions']:
             self.drawCircle(self.surface, spec['color'], p, spec['radius'])
+            if spec['paint']:
+                self.drawCircle(self.static_surface, spec['color'], p, spec['radius'])
 
     def updateDynamicPointArray(self, name, update):
         # Note, the functionality of updateDynamicLine is precicsely what is
