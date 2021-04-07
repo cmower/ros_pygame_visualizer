@@ -38,3 +38,10 @@ you can not specify additional coordinate frames - future work.
 ### Image
 
 Displays image feeds on topics with message types `sensor_msgs/Image`.
+
+# Services
+
+### `SaveImage`
+
+Calls to `save_image` will save the screen, or any of the individual windows.
+
