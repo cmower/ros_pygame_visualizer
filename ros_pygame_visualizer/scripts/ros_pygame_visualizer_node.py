@@ -15,9 +15,6 @@ RP = rospkg.RosPack()
 
 class Node:
 
-    path_to_pictures = os.path.join(os.environ['HOME'], 'Data', 'ros_pygame_visualizer')
-    assert os.path.exists(path_to_pictures), f"The directory {path_to_pictures} must exist!"
-
     def __init__(self):
 
         # Setup variables
@@ -32,6 +29,10 @@ class Node:
         main_config_filename = rospy.get_param('~main')
         main_config = self.loadConfig(main_config_filename)
         self.main_screen = interface.MainScreen(main_config, hz)
+        if 'pictures_directory' in main_config:
+            self.pictures_directory = main_config['pictures_directory']
+        else:
+            self.pictures_directory = os.path.join(os.environ['HOME'], 'Pictures')
         self.msg_keys = set()
         rospy.loginfo(f'Setup main screen window at index 0.')
 
