@@ -73,11 +73,11 @@ class Node:
                         self.startSubscriber(object_name, object_topic, Point)
 
                     elif object_type == 'dynamic_line':
-                        dynamic_object['handle'] = self.handleDynamicLine
+                        dynamic_object['handle'] = self.handlePositionArrayLike
                         self.startSubscriber(object_name, object_topic, Float64MultiArray)
 
                     elif object_type == 'dynamic_point_array':
-                        dynamic_object['handle'] = self.handleDynamicPointArray
+                        dynamic_object['handle'] = self.handlePositionArrayLike
                         self.startSubscriber(object_name, object_topic, Float64MultiArray)
 
                     window['dynamic_objects'].append(dynamic_object)
@@ -160,16 +160,7 @@ class Node:
         N = int(len(msg.data)/2)
         return [[px, py] for px, py in zip(msg.data[:N], msg.data[N:])]
 
-    def handleDynamicLine(self, window, dynamic_object):
-        name = dynamic_object['name']
-        msg = self.getMsg(name)
-        if msg is None: return
-        update = {
-            'positions': self.extractPositionsFromFloat64MultiArrayMsg(msg)
-        }
-        window['object'].updateDynamicObject(name, update)
-
-    def handleDynamicPointArray(self, window, dynamic_object):
+    def handlePositionArrayLike(self, window, dynamic_object):
         name = dynamic_object['name']
         msg = self.getMsg(name)
         if msg is None: return
