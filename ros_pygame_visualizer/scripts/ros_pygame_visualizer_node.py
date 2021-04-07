@@ -3,10 +3,11 @@ import rospy
 # import re
 import rospkg
 import yaml
-from sensor_msgs.msg import Joy
+from sensor_msgs.msg import Joy, Image
 from std_msgs.msg import Int64, Float64MultiArray
 from geometry_msgs.msg import Point
 import ros_pygame_visualizer.pygame_interface as interface
+from cv_bridge import CvBridge
 
 RP = rospkg.RosPack()
 
@@ -27,6 +28,9 @@ class Node:
         main_config = self.loadConfig(main_config_filename)
         self.main_screen = interface.MainScreen(main_config, hz)
         self.msg_keys = set()
+
+        # Setup cv bridge
+        self.cv_bridge = CvBridge()
 
         # Init window
         self.windows = []
@@ -50,6 +54,15 @@ class Node:
                 window['horizontal_index'] = config['horizontal_index']
                 window['vertical_index'] = config['vertical_index']
                 self.startSubscriber(name, config['topic'], Joy)
+
+            # Image
+            if config['type'] == 'image':
+                window['topic'] = config['topic']
+                window['object'] = interface.ImageWindow(config)
+                window['update_handle'] = self.handleImage
+                window['width'] = config['width']
+                window['height'] = config['height']
+                self.startSubscriber(name, config['topic'], Image)
 
             # Planar workspace
             if config['type'] == 'planar_workspace':
@@ -112,6 +125,14 @@ class Node:
 
     def callback(self, msg, label):
         self.msgs[label] = msg
+
+    def handleImage(self, window):
+        name = window['name']
+        msg = self.getMsg(name)
+        if msg is None: return
+        cv_image = self.cv_bridge.imgmsg_to_cv2(msg, desired_encoding='rgb8')
+        window['object'].setImage(cv_image)
+        window['object'].reset()
 
     def handleJoystick(self, window):
 

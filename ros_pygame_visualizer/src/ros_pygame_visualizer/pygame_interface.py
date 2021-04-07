@@ -152,6 +152,22 @@ class BaseObject:
         text_surface = self.fonts[key].render(text, antialias, pygame.Color(color), background=background)
         surface.blit(text_surface, (0, 0))
 
+class ImageWindow(BaseObject):
+
+    def __init__(self, config):
+        super().__init__(config)
+
+    def setImage(self, image):
+        # NOTE: Need to rotate surface by -90 degrees and then flip on the
+        # x-axis. Probably there is a better way to do this in the handleImage
+        # method in ros_pygame_visualizer_node.py script.
+        surface = pygame.surfarray.make_surface(image)
+        self.image = pygame.transform.flip(pygame.transform.rotate(surface, -90), True, False)
+
+    def reset(self):
+        self.resetBaseObject()
+        self.blit(self.image, (0, 0))
+
 class PlanarWorkspaceWindow(BaseObject):
 
     def __init__(self, config):
