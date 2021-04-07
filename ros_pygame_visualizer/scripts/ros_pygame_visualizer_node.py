@@ -115,24 +115,21 @@ class Node:
         rospy.Service('save_image', SaveImage, self.saveImageService)
 
     def saveImageService(self, req):
-        window = req.window
-        success = 0
-        if window == 0:
-            stamp = rospy.Time.now().to_sec()
-            filename = os.path.join(self.path_to_pictures, f'main_screen_{stamp}.png')
-            self.main_screen.save(filename)
-        elif window > 0:
-            idx = window - 1
+        if req.window == 0:
+            name = 'main_screen'
+            obj = self.main_screen
+        elif req.window > 0:
+            idx = req.window - 1
             name = self.windows[idx]['name']
-            stamp = rospy.Time.now().to_sec()
-            filename = os.path.join(self.path_to_pictures, f'{name}_{stamp}.png')
-            self.windows[idx]['object'].save(filename)
+            obj = self.windows[idx]['object']
         else:
-            rospy.logerr('Window request for service save_image needs to be >=0.')
-            success = 1
-        if success == 0:
-            rospy.loginfo(f'Saved {filename}')
-        return SaveImageResponse(success)
+            rospy.logwarn('Window request for service save_image needs to be >=0.')
+            return SaveImageResponse(1)
+        stamp = rospy.Time.now().to_sec()
+        filename = os.path.join(self.pictures_directory, f'{name}_{stamp}.png')
+        obj.save(filename)
+        rospy.loginfo(f'Saved {filename}.')
+        return SaveImageResponse(0)
 
     def startSubscriber(self, name, topic, msg_type):
         assert name not in self.msg_keys, "name ({name}) must be unique."
