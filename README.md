@@ -34,3 +34,7 @@ be easily specified. The following objects can be visualized:
 **Note**, currently coordinates must be specified in the local window frame
 (scaling between meters and pixels is handled in the config file). At present,
 you can not specify additional coordinate frames - future work.
+
+### Image
+
+Displays image feeds on topics with message types `sensor_msgs/Image`.
