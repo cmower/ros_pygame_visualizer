@@ -53,9 +53,10 @@ class BaseObject:
         # Setup fonts
         self.fonts = {}
 
-    def inConfig(self, key):
-        if key in self.config.keys():
-            return self.config[key]
+    def inConfig(self, key, config=None):
+        if config is None: config = self.config
+        if key in config.keys():
+            return config[key]
         else:
             return None
 
