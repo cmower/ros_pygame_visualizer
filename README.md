@@ -31,6 +31,6 @@ be easily specified. The following objects can be visualized:
 - *Dynamic point array*: tracks `std_msgs/Float64MultiArray` that define points
   on the surface to visualize.
 
-**Note**, currently coordinates must be specified in the local image frame
+**Note**, currently coordinates must be specified in the local window frame
 (scaling between meters and pixels is handled in the config file). At present,
 you can not specify additional coordinate frames - future work.
