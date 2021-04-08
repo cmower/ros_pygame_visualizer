@@ -114,6 +114,9 @@ class Node:
         # Init services
         rospy.Service('save_image', SaveImage, self.saveImageService)
 
+    def null(self, *args, **kwargs):
+        pass
+
     def saveImageService(self, req):
         if req.window == 0:
             name = 'main_screen'
