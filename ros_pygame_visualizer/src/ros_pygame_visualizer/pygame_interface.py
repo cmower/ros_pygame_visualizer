@@ -145,9 +145,9 @@ class BaseObject:
             self.fonts[key] = pygame.font.SysFont(name, size, bold=bold, italic=italic)
         return key
 
-    def drawText(self, surface, key, text, antialias, color, background=None):
-        text_surface = self.fonts[key].render(text, antialias, pygame.Color(color), background=background)
-        surface.blit(text_surface, (0, 0))
+    def drawText(self, surface, key, text, antialias, color, position=(0, 0), background=None):
+        text_surface = self.fonts[key].render(text, antialias, pygame.Color(color), background)
+        surface.blit(text_surface, position)
 
 class ImageWindow(BaseObject):
 
