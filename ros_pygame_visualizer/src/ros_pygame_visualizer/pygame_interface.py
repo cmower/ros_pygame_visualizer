@@ -53,12 +53,12 @@ class BaseObject:
         # Setup fonts
         self.fonts = {}
 
-    def inConfig(self, key, config=None):
+    def inConfig(self, key, config=None, default=None):
         if config is None: config = self.config
         if key in config.keys():
             return config[key]
         else:
-            return None
+            return default
 
     def save(self, filename):
         pygame.image.save(self.surface, filename)
