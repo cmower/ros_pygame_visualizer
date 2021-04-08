@@ -28,10 +28,7 @@ class BaseObject:
 
         # Setup surface
         width = self.config['width']
-        if 'height' in self.config.keys():
-            height = self.config['height']
-        else:
-            height = width
+        height = self.inConfig('height', default=width)
         dims = (width, height)
         self.surface = pygame.Surface(dims)
 
