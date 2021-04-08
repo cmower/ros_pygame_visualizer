@@ -149,6 +149,37 @@ class BaseObject:
         text_surface = self.fonts[key].render(text, antialias, pygame.Color(color), background)
         surface.blit(text_surface, position)
 
+class TextWindow(BaseObject):
+
+    def __init__(self, config):
+        super().__init__(config)
+        static = self.inConfig('static', default=True)
+        font_name = self.inConfig('font', default='Comic Sans MS')
+        font_size = self.inConfig('size', default=self.height) # TODO: check this is feasible
+        font_bold = self.inConfig('bold', default=False)
+        font_italic = self.inConfig('italic', default=False)
+        self.font_key = self.setupFont(font_name, font_size, bold=font_bold, italic=font_italic)
+        self.antialias = self.inConfig('antialias', default=True)
+        self.color = self.inConfig('color', default='black')
+        self.background = self.inConfig('background')
+        self.text = self.inConfig('text', default='')
+        self.text_position = self.inConfig('text_position', default=(0, 0))
+        if static:
+            self.blit(self.static_surface, (0, 0))
+            self.drawText(self.surface, self.font_key, self.text, self.antialias, self.color, position=self.text_position, background=self.background)
+
+    def setText(self, text):
+        self.text = text
+
+    def setTextPosition(self, position):
+        self.text_position = position
+
+    def reset(self):
+        self.resetBaseObject()
+        self.drawText(self.surface, self.font_key, self.text, self.antialias, self.color, position=self.text_position, background=self.background)
+
+
+
 class ImageWindow(BaseObject):
 
     def __init__(self, config):

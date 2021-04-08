@@ -5,7 +5,7 @@ import rospy
 import rospkg
 import yaml
 from sensor_msgs.msg import Joy, Image
-from std_msgs.msg import Int64, Float64MultiArray
+from std_msgs.msg import Int64, Float64MultiArray, String
 from geometry_msgs.msg import Point
 import ros_pygame_visualizer.pygame_interface as interface
 from ros_pygame_visualizer.srv import SaveImage, SaveImageResponse
@@ -72,6 +72,24 @@ class Node:
                 window['width'] = config['width']
                 window['height'] = config['height']
                 self.startSubscriber(name, config['topic'], Image)
+
+            # Text
+            if window_type == 'text':
+                if 'static' in config.keys():
+                    static = config['static']
+                else:
+                    static = True
+                window['static'] = static
+                window['object'] = interface.TextWindow(config)
+
+                if static:
+                    # Treat as static
+                    window['update_handle'] = self.null
+                else:
+                    # Treat as dynamic
+                    window['topic'] = config['topic']
+                    window['update_handle'] = self.handleText
+                    self.startSubscriber(name, config['topic'], String)
 
             # Planar workspace
             if window_type == 'planar_workspace':
@@ -188,6 +206,13 @@ class Node:
         for dynamic_object in window['dynamic_objects']:
             handle = dynamic_object['handle']
             handle(window, dynamic_object)
+        window['object'].reset()
+
+    def handleText(self, window):
+        name = window['name']
+        msg = self.getMsg(name)
+        if msg is None: return
+        window['object'].setText(msg.data)
         window['object'].reset()
 
     def getMsg(self, name):

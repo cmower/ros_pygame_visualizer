@@ -22,7 +22,8 @@
         value="$(find ros_pygame_visualizer)/example_resources/two_joystick_example_main.yaml"/>
     <rosparam param="windows">[
     $(find ros_pygame_visualizer)/example_resources/two_joystick_example_left.yaml,
-    $(find ros_pygame_visualizer)/example_resources/two_joystick_example_right.yaml
+    $(find ros_pygame_visualizer)/example_resources/two_joystick_example_right.yaml,
+    $(find ros_pygame_visualizer)/example_resources/two_joystick_example_text.yaml,
     ]</rosparam>
   </node>
 

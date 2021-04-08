@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 import random
+from std_msgs.msg import String
 from sensor_msgs.msg import Joy
 from geometry_msgs.msg import Point
 from std_msgs.msg import Float64MultiArray
@@ -18,7 +19,9 @@ class Node:
         self.pub_robot = rospy.Publisher('robot/position', Point, queue_size=10)
         self.pub_pred = rospy.Publisher('prediction/position', Float64MultiArray, queue_size=10)
         self.pub_point_array = rospy.Publisher('point_array/position', Float64MultiArray, queue_size=10)
+        self.pub_text = rospy.Publisher('text', String, queue_size=10)
         self.points = []
+        self.count = 0
         rospy.Subscriber('joy', Joy, self.callback)
         rospy.Timer(rospy.Duration(self.dt), self.mainLoop)
         rospy.Timer(rospy.Duration(1.0), self.publishPointArray)
@@ -26,6 +29,8 @@ class Node:
     def publishPointArray(self, event):
         self.points.append([0.6*random.random(), 0.45*random.random()])
         self.pub_point_array.publish(Float64MultiArray(data=[p[0] for p in self.points] + [p[1] for p in self.points]))
+        self.pub_text.publish(String(data=f'Hello world {self.count}'))
+        self.count += 1
 
     def callback(self, msg):
         self.u = [-self.maxu * msg.axes[0], -self.maxu * msg.axes[1]]
@@ -39,6 +44,7 @@ class Node:
             p_new = [p+self.dt*u for p, u in zip(p_old, self.u)]
             prediction[i+1] = p_new
         self.pub_pred.publish(Float64MultiArray(data=[p[0] for p in prediction]+[p[1] for p in prediction]))
+
 
     def spin(self):
         rospy.spin()

@@ -23,6 +23,7 @@
     <rosparam param="windows">[
     $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_planar_workspace.yaml,
     $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_joy.yaml,
+    $(find ros_pygame_visualizer)/example_resources/robot_and_joystick_example_text.yaml,
     ]</rosparam>
   </node>
 

@@ -1,0 +1,11 @@
+type: 'text'
+position: [50, 475]
+static: True
+width: 850
+height: 50
+text: 'Hello World!'
+size: 30
+color: 'yellow'
+background: 'magenta'
+background_color: 'cyan'
+text_position: [350, 10]

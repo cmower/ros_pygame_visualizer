@@ -39,6 +39,13 @@ you can not specify additional coordinate frames - future work.
 
 Displays image feeds on topics with message types `sensor_msgs/Image`.
 
+### Text
+
+Print text to a window. Currently, supports cases two cases.
+- Static case where the text is given.
+- Dynamic case where the text is updated with reference to a ROS message of type
+  `std_msgs/String`.
+
 # Services
 
 ### `SaveImage`
