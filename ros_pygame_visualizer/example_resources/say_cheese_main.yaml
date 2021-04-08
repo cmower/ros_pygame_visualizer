@@ -1,0 +1,8 @@
+# Required
+width: 740
+height: 580
+
+# Optional
+background_color: 'blue'
+caption: 'Example: Say Cheese'
+

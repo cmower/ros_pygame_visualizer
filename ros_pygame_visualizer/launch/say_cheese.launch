@@ -1,0 +1,17 @@
+<launch>
+
+  <!-- Start camera node, assumes there is a camera connected -->
+  <node pkg="usb_cam" name="say_cheese" type="usb_cam_node"/>
+
+  <!-- Start visualizer -->
+  <node pkg="ros_pygame_visualizer" name="visualizer" type="ros_pygame_visualizer_node.py" output="screen">
+    <param name="main" type="str"
+        value="$(find ros_pygame_visualizer)/example_resources/say_cheese_main.yaml"/>
+    <rosparam param="windows">[
+    $(find ros_pygame_visualizer)/example_resources/say_cheese_image.yaml,
+    ]</rosparam>
+  </node>
+
+
+
+</launch>

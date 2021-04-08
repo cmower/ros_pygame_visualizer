@@ -1,0 +1,7 @@
+# Required
+type: image
+width: 640
+height: 480
+background_color: green
+position: [50, 50]
+topic: /say_cheese/image_raw
