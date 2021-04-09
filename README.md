@@ -41,7 +41,7 @@ Displays image feeds on topics with message types `sensor_msgs/Image`.
 
 ### Text
 
-Print text to a window. Currently, supports cases two cases.
+Print text to a window. Currently, supports two cases.
 - Static case where the text is given.
 - Dynamic case where the text is updated with reference to a ROS message of type
   `std_msgs/String`.
