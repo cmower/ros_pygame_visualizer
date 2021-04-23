@@ -244,7 +244,7 @@ class Node(RosNode):
             if is_ros_shutdown:
                 rospy.logwarn('ROS shutdown, killing visualizer.')
                 flag = 2
-            self.status_pub.publish(Int64(data=flag))
+            self.publishInt64('status', flag)
 
             # Update
             keep_running = keep_running_main_loop and (not is_ros_shutdown)
