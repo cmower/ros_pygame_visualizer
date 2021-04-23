@@ -9,8 +9,6 @@ import ros_pygame_visualizer.pygame_interface as interface
 from ros_pygame_visualizer.srv import SaveImage, SaveImageResponse
 from cv_bridge import CvBridge
 
-# RP = rospkg.RosPack()
-
 class Node(RosNode):
 
     hz = 40
