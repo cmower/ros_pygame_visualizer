@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 import os
 import rospy
-# import re
-import rospkg
-import yaml
+from ros_helper.node import RosNode
 from sensor_msgs.msg import Joy, Image
 from std_msgs.msg import Int64, Float64MultiArray, String
 from geometry_msgs.msg import Point
@@ -11,29 +9,29 @@ import ros_pygame_visualizer.pygame_interface as interface
 from ros_pygame_visualizer.srv import SaveImage, SaveImageResponse
 from cv_bridge import CvBridge
 
-RP = rospkg.RosPack()
+class Node(RosNode):
 
-class Node:
+    hz = 40
 
     def __init__(self):
 
-        # Setup variables
-        self.msgs = {}
-
         # Init ros
-        rospy.init_node('ros_pygame_visualizer_node')
+        super().__init__(rospy)
+        self.initNode('ros_pygame_visualizer_node')
+        self.initTf2()
+        self.getParams([
+            ('~main',),
+            ('~windows',),
+        ])
 
         # Init main screen
-        hz = 40
         self.main_loop_iter = 0
-        main_config_filename = rospy.get_param('~main')
-        main_config = self.loadConfig(main_config_filename)
-        self.main_screen = interface.MainScreen(main_config, hz)
+        main_config = self.loadConfig(self.params['~main'])
+        self.main_screen = interface.MainScreen(main_config, self.hz)
         if 'pictures_directory' in main_config:
             self.pictures_directory = main_config['pictures_directory']
         else:
             self.pictures_directory = os.path.join(os.environ['HOME'], 'Pictures')
-        self.msg_keys = set()
         rospy.loginfo(f'Setup main screen window at index 0.')
 
         # Setup cv bridge
@@ -41,7 +39,7 @@ class Node:
 
         # Init window
         self.windows = []
-        for idx, filename in enumerate(rospy.get_param('~windows')):
+        for idx, filename in enumerate(self.params['~windows']):
 
             # Window setup
             config = self.loadConfig(filename)
@@ -126,14 +124,9 @@ class Node:
             self.windows.append(window)
             rospy.loginfo(f'Setup {window_type} window at index {window_index}.')
 
-        # Init status publisher
-        self.status_pub = rospy.Publisher('ros_pygame_visualizer/status', Int64, queue_size=10)
-
-        # Init services
-        rospy.Service('save_image', SaveImage, self.saveImageService)
-
-    def null(self, *args, **kwargs):
-        pass
+        # Setup publishers and start services
+        self.setupInt64Publisher('status', 'ros_pygame_visualizer/status', Int64)
+        self.startService('save_image', SaveImage, self.saveImageService)
 
     def saveImageService(self, req):
         if req.window == 0:
@@ -151,31 +144,6 @@ class Node:
         obj.save(filename)
         rospy.loginfo(f'Saved {filename}.')
         return SaveImageResponse(0)
-
-    def startSubscriber(self, name, topic, msg_type):
-        assert name not in self.msg_keys, "name ({name}) must be unique."
-        rospy.Subscriber(topic, msg_type, self.callback, callback_args=name)
-        self.msg_keys.add(name)
-
-    def loadConfig(self, filename):
-
-        # Replace package path in filename
-        if '$(find' in filename and ')' in filename:
-            # pattern = '$(find \(.*?\))'
-            # matches = re.findall(pattern, filename)
-            filename = filename.replace('$(find ', '') # assume filename starts with '$(find '
-            idx_closing_bracket = filename.find(')')
-            package = filename[:idx_closing_bracket]
-            root = RP.get_path(package)
-            filename = filename.replace(f'{package})', root)
-
-        # Load configuration
-        with open(filename, 'r') as configfile:
-            config = yaml.load(configfile, Loader=yaml.FullLoader)
-        return config
-
-    def callback(self, msg, label):
-        self.msgs[label] = msg
 
     def handleImage(self, window):
         name = window['name']
@@ -215,14 +183,6 @@ class Node:
         window['object'].setText(msg.data)
         window['object'].reset()
 
-    def getMsg(self, name):
-        try:
-            msg = self.msgs[name]
-        except KeyError:
-            rospy.logdebug(f'Did not receive messages for the object called {name} yet!')
-            msg = None
-        return msg
-
     def handleDynamicPoint(self, window, dynamic_object):
         name = dynamic_object['name']
         msg = self.getMsg(name)
@@ -248,7 +208,7 @@ class Node:
         }
         window['object'].updateDynamicObject(name, update)
 
-    def mainLoop(self):
+    def updateMainScreen(self):
 
         # Reset main screen
         self.main_screen.reset()
@@ -265,11 +225,6 @@ class Node:
         if did_user_quit:
             rospy.logwarn('User quit visualizer, shutting down.')
 
-        # Report main loop completion
-        self.main_loop_iter += 1
-        # s = 's' if self.main_loop_iter > 1 else ''
-        # rospy.loginfo(f'Completed {self.main_loop_iter} iteration{s} of main loop.')
-
         return not did_user_quit
 
     def spin(self):
@@ -279,7 +234,7 @@ class Node:
         while keep_running:
 
             # Main update
-            keep_running_main_loop = self.mainLoop()
+            keep_running_main_loop = self.updateMainScreen()
             is_ros_shutdown = rospy.is_shutdown()
 
             # Report status
@@ -289,10 +244,11 @@ class Node:
             if is_ros_shutdown:
                 rospy.logwarn('ROS shutdown, killing visualizer.')
                 flag = 2
-            self.status_pub.publish(Int64(data=flag))
+            self.publishInt64('status', flag)
 
             # Update
             keep_running = keep_running_main_loop and (not is_ros_shutdown)
+            self.main_loop_iter += 1
 
         self.main_screen.shutdown()
 
