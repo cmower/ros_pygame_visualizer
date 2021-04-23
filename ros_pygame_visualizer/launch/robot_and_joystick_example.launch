@@ -6,7 +6,6 @@
   <node pkg="operator_node" name="keyboard_to_joy_mapper_node" type="keyboard_to_joy_mapper_node.py" output="screen">
     <rosparam param="positive_axes">[KEY_LEFT, KEY_UP]</rosparam>
     <rosparam param="negative_axes">[KEY_RIGHT, KEY_DOWN]</rosparam>
-    <rosparam param="flip">[1, 0]</rosparam>
     <param name="frequency" type="int" value="100"/>
   </node>
 
