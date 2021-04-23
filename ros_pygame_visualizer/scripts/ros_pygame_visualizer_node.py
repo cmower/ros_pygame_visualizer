@@ -18,6 +18,7 @@ class Node(RosNode):
         # Init ros
         super().__init__(rospy)
         self.initNode('ros_pygame_visualizer_node')
+        self.initTf2()
         self.getParams([
             ('~main',),
             ('~windows',),
