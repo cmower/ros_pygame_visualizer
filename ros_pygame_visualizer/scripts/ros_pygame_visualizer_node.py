@@ -209,7 +209,7 @@ class Node(RosNode):
         }
         window['object'].updateDynamicObject(name, update)
 
-    def mainLoop(self):
+    def updateMainScreen(self):
 
         # Reset main screen
         self.main_screen.reset()
@@ -226,11 +226,6 @@ class Node(RosNode):
         if did_user_quit:
             rospy.logwarn('User quit visualizer, shutting down.')
 
-        # Report main loop completion
-        self.main_loop_iter += 1
-        # s = 's' if self.main_loop_iter > 1 else ''
-        # rospy.loginfo(f'Completed {self.main_loop_iter} iteration{s} of main loop.')
-
         return not did_user_quit
 
     def spin(self):
@@ -240,7 +235,7 @@ class Node(RosNode):
         while keep_running:
 
             # Main update
-            keep_running_main_loop = self.mainLoop()
+            keep_running_main_loop = self.updateMainScreen()
             is_ros_shutdown = rospy.is_shutdown()
 
             # Report status
@@ -254,6 +249,7 @@ class Node(RosNode):
 
             # Update
             keep_running = keep_running_main_loop and (not is_ros_shutdown)
+            self.main_loop_iter += 1
 
         self.main_screen.shutdown()
 
