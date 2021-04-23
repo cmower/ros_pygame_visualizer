@@ -19,13 +19,13 @@ class Node(RosNode):
         super().__init__(rospy)
         self.initNode('ros_pygame_visualizer_node')
         self.getParams([
-            ('main_filename', '~main',),
-            ('window_filenames', '~windows',),
+            ('~main',),
+            ('~windows',),
         ])
 
         # Init main screen
         self.main_loop_iter = 0
-        main_config = self.loadConfig(self.params['main_filename'])
+        main_config = self.loadConfig(self.params['~main'])
         self.main_screen = interface.MainScreen(main_config, self.hz)
         if 'pictures_directory' in main_config:
             self.pictures_directory = main_config['pictures_directory']
@@ -38,7 +38,7 @@ class Node(RosNode):
 
         # Init window
         self.windows = []
-        for idx, filename in enumerate(self.params['window_filenames']):
+        for idx, filename in enumerate(self.params['~windows']):
 
             # Window setup
             config = self.loadConfig(filename)
