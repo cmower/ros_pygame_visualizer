@@ -1,5 +1,10 @@
 # ros_pygame_visualizer
 
+**PROJECT ARCHIEVED** [July 2021]
+
+*Currently, I don't have the time to maintain this project and can't justify it since I only used it in one minor side-project. However, perhaps later on if I find I need this sort of functionality it would be good to use [pygame_teleop](https://github.com/cmower/pygame_teleop) as a backend and then this ROS package should be a fairly straight-forward implementation.*
+
+
 This package allows you to quickly setup various visualizations. When the main
 `ros_pygame_visualizer` node is launched a *screen* appears that can be
 configured to track ROS data and visualize it. Any number of config files can be
